@@ -11,8 +11,6 @@
 // new orange to work on. Once the worker has worked on the orange, they release it back to the appropriate queue and
 // give it back to the plant.
 
-//imports for Java
-
 public class Worker implements Runnable { //this worker can be a thread, extending thread
     //is like a subtype of thread, instead running on separate thread.
 
@@ -63,9 +61,13 @@ public class Worker implements Runnable { //this worker can be a thread, extendi
         if (orange != null) {
             orange.runProcess();
             plant.chuckOrange(orange);
-            ridOf();
+            try {
+                ridOf();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         } else {
-            plant.obtainOrange(this);
+            orange = plant.obtainOrange(this);
         }
     }
 

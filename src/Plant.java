@@ -91,7 +91,7 @@ public class Plant implements Runnable {
         processingQueue = new LinkedBlockingQueue<>();
 
         //Implementing a Linked Blocking List
-        worker = new Worker[WORKER_GROUPS_PER_PLANT]; //initializing "tables" for workers
+        worker = new Worker[5*WORKER_GROUPS_PER_PLANT]; //initializing "tables" for workers
 
         for (int i = 0; i < 5*WORKER_GROUPS_PER_PLANT; i = i + 5) {
             worker[i] = new Fetcher(0, this);
