@@ -17,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Plant implements Runnable {
     // How long do we want to run the juice processing
-    public static final long PROCESSING_TIME = 5 * 1000;
+    public static final long PROCESSING_TIME = 1 * 1000;
 
     private static final int NUM_PLANTS = 2;
     private static final int WORKER_GROUPS_PER_PLANT = 2;
@@ -26,7 +26,7 @@ public class Plant implements Runnable {
         // Startup the plants
         Plant[] plantMultiplePlants = new Plant[NUM_PLANTS];
         for (int i = 0; i < NUM_PLANTS; i++) {
-            plantMultiplePlants[i] = new Plant(1);
+            plantMultiplePlants[i] = new Plant(i); //is this supposed to be i?
             plantMultiplePlants[i].startPlant();
         }
 
@@ -35,9 +35,13 @@ public class Plant implements Runnable {
 
         // Stop the plant, and wait for it to shut down
         for (Plant p : plantMultiplePlants) {
+            for (Worker worker: p.worker)
+                worker.stopWorker();
             p.stopPlant();
         }
         for (Plant p : plantMultiplePlants) {
+            for (Worker worker: p.worker)
+                worker.waitToStop();
             p.waitToStop();
         }
 
@@ -66,6 +70,7 @@ public class Plant implements Runnable {
         }
     }
 
+    //ensure this variable can be altered and program still runs.
     public final int ORANGES_PER_BOTTLE = 3;
 
     private BlockingQueue<Orange> peelerQueue;
@@ -130,7 +135,7 @@ public class Plant implements Runnable {
     //run method for Plant_MultiplePlant
     //while the there is time to work, the plant is open and the workers are doing their job
     public void run() {
-        System.out.print(Thread.currentThread().getName() + " Processing oranges");
+        System.out.print(Thread.currentThread().getName() + " Processing oranges ");
         while (timeToWork) {
             continue;
             //plant is open, workers are working...
@@ -139,17 +144,6 @@ public class Plant implements Runnable {
         System.out.println(Thread.currentThread().getName() + " Done");
     }
 
-    //method is going to return a worker/
-    /* private Worker getWorker() {
-        for (Worker worker: this.worker) {
-            if (!worker.ridOf()){
-                return worker;
-            }
-        }
-        return null;
-    } */
-
-
     //acquire an orange from the plant
     public synchronized Orange obtainOrange(Worker worker) {
         String title = worker.getTitle();
@@ -157,9 +151,11 @@ public class Plant implements Runnable {
         switch (title) {
             case "Fetcher":
                 orangesProvided++;
+                System.out.println("Fetcher got an orange.");
                 return new Orange();
             case "Peeler":
                 if (!peelerQueue.isEmpty()) {
+                    System.out.println("Peeler peeled an orange.");
                     return peelerQueue.remove();
                 }
                 try {
@@ -168,6 +164,7 @@ public class Plant implements Runnable {
                 break;
             case "Squeezer":
                 if (!squeezerQueue.isEmpty()) {
+                    System.out.println("Squeezer squeezed an orange.");
                     return squeezerQueue.remove();
                 }
                 try {
@@ -176,6 +173,7 @@ public class Plant implements Runnable {
                 break;
             case "Bottler":
                 if (!bottlerQueue.isEmpty()) {
+                    System.out.println("Bottler bottled an orange.");
                     return bottlerQueue.remove();
                 }
                 try {
@@ -184,6 +182,7 @@ public class Plant implements Runnable {
                 break;
             case "Processor":
                 if (!processingQueue.isEmpty()) {
+                    System.out.println("Processor processed an orange.");
                     return processingQueue.remove();
                 }
                 try {
@@ -215,6 +214,8 @@ public class Plant implements Runnable {
                 orangesProcessed++;
                 break;
         }
+        //after worker changes orange state and releases back to plant,
+        // all the workers and the plant needs to be notified in order to continue the process
         notifyAll();
     }
 

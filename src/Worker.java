@@ -29,7 +29,6 @@ public class Worker implements Runnable { //this worker can be a thread, extendi
         this.timeToWork = false;
     }
 
-
     //implement own do work class
     //basic worker methods
     public void startWorker() {
