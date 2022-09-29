@@ -9,7 +9,7 @@
 // for doing the work in the plant. If a worker does not have an orange to work on while timeToWork() is set to true, then
 // that worker will either obtain an orange if there is one already in the queue or if it is the fetcher, it will spawn a
 // new orange to work on. Once the worker has worked on the orange, they release it back to the appropriate queue and
-// give it back to the plant.
+// give it back to the plant. Each position is established in its own class but extend the worker class.
 
 public class Worker implements Runnable { //this worker can be a thread, extending thread
     //is like a subtype of thread, instead running on separate thread.
