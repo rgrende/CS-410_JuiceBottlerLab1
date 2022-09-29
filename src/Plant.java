@@ -3,30 +3,30 @@
 // Professor Nate Williams
 // September 26th, 2022
 
-//issues:
-//commenting
-//error handling
-//UML Diagram
-//build file
 
-//Class Description:
+//Class Description: This is the plant class, which runs multiple plants at once. This code was provided by
+// Professor Nate Williams. The plant has four shared queues between five workers. The worker runs a process on the
+// orange that they have and then returns it back to the plant. The plant keeps track of oranges provided to the workers,
+// oranges processed by the plant, how many bottles were produced, and finally how much was wasted. The program starts out
+// by setting timeToWork() to true and then notifies the workers to start working. The works are assigned a title upon the
+// program start up.
 
 //Imports for Java
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Plant_MultiplePlant implements Runnable {
+public class Plant implements Runnable {
     // How long do we want to run the juice processing
     public static final long PROCESSING_TIME = 5 * 1000;
 
     private static final int NUM_PLANTS = 2;
-    private static final int WORKER_GROUPS_PER_PLANT = 4;
+    private static final int WORKER_GROUPS_PER_PLANT = 2;
 
     public static void main(String[] args) {
         // Startup the plants
-        Plant_MultiplePlant[] plantMultiplePlants = new Plant_MultiplePlant[NUM_PLANTS];
+        Plant[] plantMultiplePlants = new Plant[NUM_PLANTS];
         for (int i = 0; i < NUM_PLANTS; i++) {
-            plantMultiplePlants[i] = new Plant_MultiplePlant(1);
+            plantMultiplePlants[i] = new Plant(1);
             plantMultiplePlants[i].startPlant();
         }
 
@@ -34,10 +34,10 @@ public class Plant_MultiplePlant implements Runnable {
         delay(PROCESSING_TIME, "Plant malfunction");
 
         // Stop the plant, and wait for it to shut down
-        for (Plant_MultiplePlant p : plantMultiplePlants) {
+        for (Plant p : plantMultiplePlants) {
             p.stopPlant();
         }
-        for (Plant_MultiplePlant p : plantMultiplePlants) {
+        for (Plant p : plantMultiplePlants) {
             p.waitToStop();
         }
 
@@ -46,7 +46,7 @@ public class Plant_MultiplePlant implements Runnable {
         int totalProcessed = 0;
         int totalBottles = 0;
         int totalWasted = 0;
-        for (Plant_MultiplePlant p : plantMultiplePlants) {
+        for (Plant p : plantMultiplePlants) {
             totalProvided += p.getProvidedOranges();
             totalProcessed += p.getProcessedOranges();
             totalBottles += p.getBottles();
@@ -80,7 +80,7 @@ public class Plant_MultiplePlant implements Runnable {
     private int orangesProcessed;
     private volatile boolean timeToWork;
 
-    Plant_MultiplePlant(int threadNum) { //constructor
+    Plant(int threadNum) { //constructor
         orangesProvided = 0;
         orangesProcessed = 0;
         thread = new Thread(this, "Plant[" + threadNum + "]");
@@ -100,8 +100,8 @@ public class Plant_MultiplePlant implements Runnable {
             worker[i+3] = new Bottler(3, this);
             worker[i+4] = new Processor(4, this);
         }
-        for(Worker w: worker) {
-            w.startWorker();
+        for(Worker worker: worker) {
+            worker.startWorker();
         }
     }
 

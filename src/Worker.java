@@ -3,17 +3,13 @@
 // Professor Nate Williams
 // September 26th, 2022
 
-//NOTES:
-//worker class, will be separate workers
-//two queues, producer and consumer queues.
-//classes uppercase, first letter
-//constance all capital w/ underscores
-//methods or variables camelcase
-//this.incoming  incoming queue
-//outgoing queue
-//runProcess
 
-//Class Description:
+//Class Description: This is the worker class. Here the basic outline of a worker is defined with qualities
+// that will be re-described in each of the worker type classes, ie. fetcher, peeler, etc. This class is responsible
+// for doing the work in the plant. If a worker does not have an orange to work on while timeToWork() is set to true, then
+// that worker will either obtain an orange if there is one already in the queue or if it is the fetcher, it will spawn a
+// new orange to work on. Once the worker has worked on the orange, they release it back to the appropriate queue and
+// give it back to the plant.
 
 //imports for Java
 
@@ -22,13 +18,13 @@ public class Worker implements Runnable { //this worker can be a thread, extendi
 
     //class variables for the Worker class
     private final Thread thread;
-    private Plant_MultiplePlant plant;
+    private Plant plant;
     private volatile boolean timeToWork;
     private Orange orange; //keeping track of what orange is held
     public String title;
 
     //constructor that passes in parameters number of threads and what plant the workers work for.
-    public Worker(int threadNum, Plant_MultiplePlant plant) { //DELETED TITLE PARAM
+    public Worker(int threadNum, Plant plant) { //DELETED TITLE PARAM
         thread = new Thread(this, "Plant[" + threadNum + "]");
         this.plant = plant;
         this.title = null;
