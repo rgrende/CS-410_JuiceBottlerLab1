@@ -20,7 +20,7 @@ public class Plant_MultiplePlant implements Runnable {
     public static final long PROCESSING_TIME = 5 * 1000;
 
     private static final int NUM_PLANTS = 2;
-    private static final int WORKERS_PER_PLANT = 4;
+    private static final int WORKER_GROUPS_PER_PLANT = 4;
 
     public static void main(String[] args) {
         // Startup the plants
@@ -85,11 +85,23 @@ public class Plant_MultiplePlant implements Runnable {
         orangesProcessed = 0;
         thread = new Thread(this, "Plant[" + threadNum + "]");
 
-        //Implementing a Linked Blocking List
-        worker = new Worker[WORKERS_PER_PLANT]; //initializing "tables" for workers
-        for (int i = 0; i < WORKERS_PER_PLANT; i++) {
-            worker[i] = new Worker(i, this);
+        peelerQueue = new LinkedBlockingQueue<>();
+        squeezerQueue = new LinkedBlockingQueue<>();
+        bottlerQueue = new LinkedBlockingQueue<>();
+        processingQueue = new LinkedBlockingQueue<>();
 
+        //Implementing a Linked Blocking List
+        worker = new Worker[WORKER_GROUPS_PER_PLANT]; //initializing "tables" for workers
+
+        for (int i = 0; i < 5*WORKER_GROUPS_PER_PLANT; i = i + 5) {
+            worker[i] = new Fetcher(0, this);
+            worker[i+1] = new Peeler(1, this);
+            worker[i+2] = new Squeezer(2, this);
+            worker[i+3] = new Bottler(3, this);
+            worker[i+4] = new Processor(4, this);
+        }
+        for(Worker w: worker) {
+            w.startWorker();
         }
     }
 
@@ -127,15 +139,15 @@ public class Plant_MultiplePlant implements Runnable {
         System.out.println(Thread.currentThread().getName() + " Done");
     }
 
-    //method is going to return a worker
-    private Worker getWorker() {
+    //method is going to return a worker/
+    /* private Worker getWorker() {
         for (Worker worker: this.worker) {
-            if (!worker.hasOrange()){
+            if (!worker.ridOf()){
                 return worker;
             }
         }
         return null;
-    }
+    } */
 
 
     //acquire an orange from the plant
@@ -144,30 +156,39 @@ public class Plant_MultiplePlant implements Runnable {
         //switch statement to assign a title to a worker
         switch (title) {
             case "Fetcher":
+                orangesProvided++;
                 return new Orange();
             case "Peeler":
                 if (!peelerQueue.isEmpty()) {
                     return peelerQueue.remove();
                 }
-                worker.wait();
+                try {
+                    worker.wait();
+                } catch (Exception e) {}
                 break;
             case "Squeezer":
                 if (!squeezerQueue.isEmpty()) {
                     return squeezerQueue.remove();
                 }
-                worker.wait();
+                try {
+                    worker.wait();
+                } catch (Exception e) {/*Ignored*/}
                 break;
             case "Bottler":
                 if (!bottlerQueue.isEmpty()) {
                     return bottlerQueue.remove();
                 }
-                worker.wait();
+                try {
+                    worker.wait();
+                } catch (Exception e) {}
                 break;
             case "Processor":
                 if (!processingQueue.isEmpty()) {
                     return processingQueue.remove();
                 }
-                worker.wait();
+                try {
+                    worker.wait();
+                } catch (Exception e) {}
                 break;
         }
         return null;
@@ -180,7 +201,7 @@ public class Plant_MultiplePlant implements Runnable {
             throw new NullPointerException("No orange to release because it did not exist.");
         }
         //switch statement to determine the state of the orange
-        switch (orange.state) {
+        switch (orange.getState()) {
             case Peeled:
                 peelerQueue.add(orange);
                 break;

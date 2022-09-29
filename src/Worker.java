@@ -16,9 +16,8 @@
 //Class Description:
 
 //imports for Java
-import java.util.concurrent.BlockingQueue;
 
-private class Worker implements Runnable { //this worker can be a thread, extending thread
+public class Worker implements Runnable { //this worker can be a thread, extending thread
     //is like a subtype of thread, instead running on separate thread.
 
     //class variables for the Worker class
@@ -26,12 +25,13 @@ private class Worker implements Runnable { //this worker can be a thread, extend
     private Plant_MultiplePlant plant;
     private volatile boolean timeToWork;
     private Orange orange; //keeping track of what orange is held
-    public final String title;
+    public String title;
 
     //constructor that passes in parameters number of threads and what plant the workers work for.
-    public Worker(int threadNum, Plant_MultiplePlant plant) {
+    public Worker(int threadNum, Plant_MultiplePlant plant) { //DELETED TITLE PARAM
         thread = new Thread(this, "Plant[" + threadNum + "]");
         this.plant = plant;
+        this.title = null;
         this.timeToWork = false;
     }
 
@@ -67,11 +67,7 @@ private class Worker implements Runnable { //this worker can be a thread, extend
         if (orange != null) {
             orange.runProcess();
             plant.chuckOrange(orange);
-            try {
-                ridOf();
-            } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
-            }
+            ridOf();
         } else {
             plant.obtainOrange(this);
         }
@@ -92,43 +88,6 @@ private class Worker implements Runnable { //this worker can be a thread, extend
         while  (timeToWork) {
             doWork();
             }
-        }
-    }
-
-
-//class for the fetcher position that extends the worker class.
-    public class Fetcher extends Worker {
-        public Fetcher(int threadNum, Plant_MultiplePlant plant) {
-            super(threadNum, plant);
-            title = "Fetcher";
-        }
-    }
-
-    public class Peeler extends Worker {
-        public Peeler(int threadNum, Plant_MultiplePlant plant) {
-            super(threadNum, plant);
-            title = "Fetcher";
-        }
-    }
-
-    public class Squeezer extends Worker {
-        public Squeezer(int threadNum, Plant_MultiplePlant plant) {
-            super(threadNum, plant);
-            title = "Squeezer";
-        }
-    }
-
-    public class Bottler extends Worker {
-        public Bottler(int threadNum, Plant_MultiplePlant plant) {
-            super(threadNum, plant);
-            title = "Bottler";
-        }
-    }
-
-    public class Processor extends Worker {
-        public Processor(int threadNum, Plant_MultiplePlant plant) {
-            super(threadNum, plant);
-            title = "Processor";
         }
     }
 
