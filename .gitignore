@@ -1,6 +1,6 @@
 #ignored files
 *.class
-/dist
-/.idea
+dist/
+.idea/
 *.iml
-/out
+out/
