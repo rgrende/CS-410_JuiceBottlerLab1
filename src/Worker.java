@@ -21,7 +21,7 @@ public class Worker implements Runnable { //this worker can be a thread, extendi
     private Orange orange; //keeping track of what orange is held
     public String title;
 
-    //constructor that passes in parameters number of threads and what plant the workers work for.
+    //constructor that passes in parameters such as number of threads and what plant the workers work for.
     public Worker(int threadNum, Plant plant) { //DELETED TITLE PARAM
         thread = new Thread(this, "Plant[" + threadNum + "]");
         this.plant = plant;
@@ -31,12 +31,13 @@ public class Worker implements Runnable { //this worker can be a thread, extendi
 
     //implement own do work class
     //basic worker methods
+    //starts all the workers
     public void startWorker() {
         timeToWork = true;
         thread.start();
     }
 
-    //method to stop worker
+    //method to stop worker at the end of the program
     public void stopWorker() {
         timeToWork = false;
     }
